@@ -1,0 +1,123 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content=""><title>Docker | SunShine's Blog</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.4.0/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><meta name="generator" content="Hexo 4.2.0"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Docker</h1><a id="logo" href="/.">SunShine's Blog</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="http://github.com/Assualt/" target="_blank" rel="noopener"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">Docker</h1><div class="post-meta">Feb 7, 2020</div><div class="post-content"><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="1-镜像"><a href="#1-镜像" class="headerlink" title="1.镜像"></a>1.镜像</h3><p>Docker镜像就是一个只读的模板，可以用于Docker容器的创建。</p>
+<h3 id="2-容器"><a href="#2-容器" class="headerlink" title="2.容器"></a>2.容器</h3><p>Docker容器是Docker镜像的一个运行实例。它可以被启动、开始、停止、删除。每一个容器都是相互隔离的，而每一个容器的资源隔离所采用的的基础的是cgroup。(<strong>cgroup 的功能在于将一台计算机上的资源（CPU，memory，network）进行分片，来防止进程间不利的资源抢占</strong>)</p>
+<h3 id="3-仓库"><a href="#3-仓库" class="headerlink" title="3.仓库"></a>3.仓库</h3><p>仓库就是集中放置镜像文件的地方。而且针对相同的镜像有着不同的tag作为版本release区分，用户可以根据自己的需求下载对应的tag的镜像。</p>
+<h3 id="4-注意事项"><a href="#4-注意事项" class="headerlink" title="4.注意事项"></a>4.注意事项</h3><p>docker的对于内核的版本的要求也是相应限制的，建议使用Ubuntu作为物理机搭建docker(<strong>Ubuntu内核相较于CentOS新，相应的内核问题就没有那么突出</strong>)，而对于CentOS, 7的话内核选用3.10, 而CentOS6默认内核为2.6，需要升级内核才能适配docker的全部功能。</p>
+<h2 id="Docker-与传统虚拟化技术的对比"><a href="#Docker-与传统虚拟化技术的对比" class="headerlink" title="Docker 与传统虚拟化技术的对比"></a>Docker 与传统虚拟化技术的对比</h2><p><img src="http://dockone.io/uploads/article/20190709/5e800c09dafefc8c9f38df1c24a049a5.jpeg" alt="1.jpeg"></p>
+<p>对于传统的虚拟化技术，docker表现出更<font color=green>轻量，更加方便和快捷</font>，能在秒级启动一个容器，能完成传统虚拟化技术的绝大多数功能。虚拟机实现资源隔离的方法是利用一个独立的Guest OS，并利用Hypervisor虚拟化CPU、内存、IO设备等实现的。例如，为了虚拟化内存，Hypervisor会创建一个shadow page table，正常情况下，一个page table可以用来实现从虚拟内存到物理内存的翻译。相比虚拟机实现资源和环境隔离的方案，Docker就显得<font color=red>简练很多</font>，它不像虚拟机一样重新加载一个操作系统内核，引导、加载操作系统内核是一个比较耗时而又消耗资源的过程，Docker是利用Linux内核特性实现的隔离，运行容器的速度几乎等同于直接启动进程。</p>
+<h3 id="docker特性"><a href="#docker特性" class="headerlink" title="docker特性"></a>docker特性</h3><ul>
+<li>使用linux中的内核特性 namespace完成系统隔离。</li>
+<li>使用linux中的内核特性 cgroup完成每一个容器的资源隔离。用以限制一个进程组能够使用的资源上限，包括CPU, 内存、硬盘、网络。</li>
+<li>使用rootfs挂在宿主机的文件挂载到容器内部，把相关数据通过此等方式传递出容器。</li>
+</ul>
+<h3 id="两者区别"><a href="#两者区别" class="headerlink" title="两者区别"></a>两者区别</h3><table>
+<thead>
+<tr>
+<th align="left">类别</th>
+<th>Docker</th>
+<th>OpenStack</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">部署难易程度</td>
+<td>非常简单</td>
+<td>组件多，部署复杂</td>
+</tr>
+<tr>
+<td align="left">启动速度</td>
+<td>秒级</td>
+<td>分钟级</td>
+</tr>
+<tr>
+<td align="left">执行性能</td>
+<td>相当于一个OS中的进程，启动很快</td>
+<td>vm会占用一些宿主机资源</td>
+</tr>
+<tr>
+<td align="left">镜像体积</td>
+<td>镜像MB级别(官方)</td>
+<td>虚拟机镜像GB级别</td>
+</tr>
+<tr>
+<td align="left">隔离性</td>
+<td>隔离性高</td>
+<td>不属于宿主机，为完全隔离</td>
+</tr>
+<tr>
+<td align="left">可管理性</td>
+<td>单进程</td>
+<td>一个独立与宿主机的管理系统(完备)</td>
+</tr>
+<tr>
+<td align="left">网络连接</td>
+<td>较弱</td>
+<td>借助neutron可以灵活进行网络管理</td>
+</tr>
+</tbody></table>
+<h3 id="Docker隔离的重要技术"><a href="#Docker隔离的重要技术" class="headerlink" title="Docker隔离的重要技术"></a>Docker隔离的重要技术</h3><p>​        docker本质就是宿主机的一个进程，docker是通过namespace实现资源隔离，通过cgroup实现资源限制，通过写时复制技术（copy-on-write）实现了高效的文件操作（类似虚拟机的磁盘比如分配500g并不是实际占用物理磁盘500g）</p>
+<ol>
+<li><p><font color=red><code>namespace</code></font>名字空间</p>
+<p>主要包含6种隔离方式：</p>
+<ul>
+<li>UTS 使用CLONE_NEWUTS 隔离主机和域名</li>
+<li>IPC  使用CLONE_NEWWIPC 隔离信号量、消息队列以及共享内存。进程通信方式</li>
+<li>PID  使用CLONE_NEWPID 隔离进程</li>
+<li>NETWORK 使用CLONE_NEWNET 隔离网络设备、网络栈和端口等</li>
+<li>MOUNT 使用CLONE_NEWNS 隔离文件系统的挂载点</li>
+<li>USER 使用CLONE_NEWUSER 隔离用户和用户组。</li>
+</ul>
+</li>
+<li><p><font color=red><code>Control Group(cgroup)</code></font>控制隔离</p>
+<p>cgroup的api以一个伪文件系统的实现方式，用户的程序可以通过文件系统实现cgroup的组件管理<br>cgroup的组件管理操作单元可以细粒度到线程级别，另外用户可以创建和销毁cgroup，从而实现资源载分配和再利用<br>所有资源管理的功能都以子系统的方式实现，接口统一子任务创建之初与其父任务处于同一个cgroup的控制组</p>
+<p>四大功能：　　　　　　　　</p>
+<p>资源限制：可以对任务使用的资源总额进行限制<br>优先级分配：通过分配的cpu时间片数量以及磁盘IO带宽大小，实际上相当于控制了任务运行优先级<br>资源统计：可以统计系统的资源使用量，如cpu时长，内存用量等<br>任务控制：cgroup可以对任务执行挂起、恢复等操作</p>
+</li>
+<li></li>
+</ol>
+<h2 id="Docker踩坑（CentOS"><a href="#Docker踩坑（CentOS" class="headerlink" title="Docker踩坑（CentOS)"></a>Docker踩坑（CentOS)</h2><h3 id="1-报错-kernel-unregister-netdevice-waiting-for-lo-to-become-free-Usage-count-1"><a href="#1-报错-kernel-unregister-netdevice-waiting-for-lo-to-become-free-Usage-count-1" class="headerlink" title="1.报错 kernel:unregister_netdevice: waiting for lo to become free. Usage count = 1"></a>1.报错 <strong>kernel:unregister_netdevice: waiting for lo to become free. Usage count = 1</strong></h3><p>此报错为因为宿主机内核版本过低，容易出现docker容器中的程序出现网络断开的情况，这个是linux内核中已知的问题<a href="https://github.com/moby/moby/issues/5618" target="_blank" rel="noopener">github Issue</a></p>
+<p>解决方案：</p>
+<ul>
+<li><p>临时解决：重启docker容器。</p>
+</li>
+<li><p>永久解决：升级宿主机的内核版本，建议升级至最新的稳定版本即可，推荐 linux 4.4 以上，升级步骤如下所示</p>
+<ul>
+<li><p>1.导入公钥</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2.安装7.x 版本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3.安装内核版本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum --enablerepo=elrepo-kernel install kernel-lt -y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>4.修改grub引导文件</p>
+<p>Centos7.x 内核升级完毕后，需要修改内核的启动顺序：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/default/grub</span><br><span class="line"></span><br><span class="line">GRUB_TIMEOUT=5</span><br><span class="line">GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"</span><br><span class="line">GRUB_DEFAULT=saved      #把这里的saved改成0</span><br><span class="line">GRUB_DISABLE_SUBMENU=true</span><br><span class="line">GRUB_TERMINAL_OUTPUT="console"</span><br><span class="line">GRUB_CMDLINE_LINUX="crashkernel=auto rhgb quiet net.ifnames=0"</span><br><span class="line">GRUB_DISABLE_RECOVERY="true"</span><br></pre></td></tr></table></figure>
+
+<p>接下来还需要运行grub2-mkconfig命令来重新创建内核配置，命令是grub2-mkconfig -o /boot/grub2/grub.cfg，如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">grub2-mkconfig -o /boot/grub2/grub.cfg</span><br><span class="line">Generating grub configuration file ...</span><br><span class="line">Found linux image: /boot/vmlinuz-4.17.171-1.el7.elrepo.x86_64</span><br><span class="line">Found initrd image: /boot/initramfs-4.17.171-1.el7.elrepo.x86_64.img</span><br><span class="line">Found linux image: /boot/vmlinuz-3.10.0-693.2.2.el7.x86_64</span><br><span class="line">Found initrd image: /boot/initramfs-3.10.0-693.2.2.el7.x86_64.img</span><br><span class="line">Found linux image: /boot/vmlinuz-3.10.0-693.el7.x86_64</span><br><span class="line">Found initrd image: /boot/initramfs-3.10.0-693.el7.x86_64.img</span><br><span class="line">Found linux image: /boot/vmlinuz-0-rescue-f0f31005fb5a436d88e3c6cbf54e25aa</span><br><span class="line">Found initrd image: /boot/initramfs-0-rescue-f0f31005fb5a436d88e3c6cbf54e25aa.img</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>5.重启服务器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reboot</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>6.查看内核版本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ uname -r</span><br><span class="line">4.4.209-1.el7.elrepo.x86_64</span><br></pre></td></tr></table></figure>
+
+<p>以上情况表示升级内核成功</p>
+<p>参考地址 <a href="https://www.cnblogs.com/clsn/p/10925653.html" target="_blank" rel="noopener">参考地址</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-报错-容器中使用python的asyncio做项目时，很容易程序因为网络问题而挂死"><a href="#2-报错-容器中使用python的asyncio做项目时，很容易程序因为网络问题而挂死" class="headerlink" title="2.报错 容器中使用python的asyncio做项目时，很容易程序因为网络问题而挂死"></a>2.报错 <strong>容器中使用python的asyncio做项目时，很容易程序因为网络问题而挂死</strong></h3><p>eg:使用python的async异步方法连接redis，kafka等其他服务器组件的时候。在处理网络异常的时候需要使得抓取异常的粒度更小化。不然一旦所有协程都会因为异常触发二次异常。如下日志所示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ERROR-10:26:27] – Error on consume Kafka message:</span><br><span class="line">[ERROR-10:26:27] – Error on consume Kafka message:</span><br><span class="line">[ERROR-10:26:27] – Error on consume Kafka message:</span><br><span class="line">[ERROR-10:26:27] – Error on consume Kafka message:</span><br><span class="line">[ERROR-10:26:27] – Error on consume Kafka message:</span><br><span class="line">[ERROR-10:26:27] – Error on consume Kafka message:</span><br><span class="line">[ERROR-10:26:27] – Error on consume Kafka message:</span><br><span class="line">[ERROR-10:26:27] – Error on consume Kafka message:</span><br></pre></td></tr></table></figure>
+
+<p>所以为了避免这一个问题，需要如下处理：</p>
+<p>１.对于网络交互层面，aioredis,aiokafka 两个类库都有断线重连的机制，所以无须考虑其如何保证断开之后的重连的动作。<br>２.对于单方面网络交互，如goldfish连接不上kafka,redis的，需要在异常处理的时候需要保证粒度更小，避免宽泛的捕获异常造成二次异常抛出。 <a href="https://docs.python.org/zh-cn/3.7/library/asyncio-exceptions.html#asyncio.CancelledError" target="_blank" rel="noopener">asyncio 异常官方文档</a></p>
+<p>如:<br>应当避免如下操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">await</span> redis_cli.get(key)</span><br><span class="line"><span class="keyword">except</span> Exception:</span><br><span class="line">     logger.warning(<span class="string">"catch exception in redis.get"</span>)</span><br><span class="line">     <span class="keyword">return</span> <span class="literal">None</span></span><br></pre></td></tr></table></figure>
+
+<p>因为容器内部使用了async的异步io库,所以在捕获异常层面需要对<font color=red>asyncio.CancelledError</font>进行特殊处理，需要做到如下处理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">await</span> redis_cli.get(key)</span><br><span class="line">execpt asyncio.CancelledError:</span><br><span class="line">     logger.warning(<span class="string">"catch exception in redis.get"</span>)</span><br><span class="line">     <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"><span class="keyword">except</span> Exception:</span><br><span class="line">     logger.warning(<span class="string">"catch exception in redis.get"</span>)</span><br><span class="line">     <span class="keyword">return</span> <span class="literal">None</span></span><br></pre></td></tr></table></figure>
+
+<p>​    3.即使不会在抛出清一色的Error on Consume Kafka messages,但是因为当前对redis的数据是一个强的依赖模块，所以<font color=red>监控内部容器主机链接redis主机的可用性</font>是优先的，是根本上解决问题的<font color=green>关键</font>。虽然异常处理可以在一定程度上减轻挂死的现象，但是改善效果不如提高redis服务的高可用好。</p>
+</div><div class="tags"><a href="/tags/Docker/">Docker</a></div><div class="post-nav"><a class="pre" href="/2020/ck6bjqsb80000ag2pgf6q4b36/hello-world/">Hello World</a><a class="next" href="/2020/ck6bkgf0500006c2p3szeg7li/avro/">avro</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://yoursite.com"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Other/" style="font-size: 15px;">Other</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/c/" style="font-size: 15px;">c++</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/ck6bjqsb80000ag2pgf6q4b36/hello-world/">Hello World</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/ck6bk8t1h0000jw2p43kph5d0/docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/ck6bkgf0500006c2p3szeg7li/avro/">avro</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/ck6bkz70q0003z82p8wug00o9/C++Lock/">Linux下4种常见进程锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/ck6blujce000oz82pfye34478/sort/">排序算法</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://github.com/Assualt/" title="Github" target="_blank">Github</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2020 <a href="/." rel="nofollow">SunShine's Blog.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
